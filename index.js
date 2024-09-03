@@ -1,11 +1,18 @@
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { setupMessageListener } = require('./events/MessageCreate/chatbotHandler');
 const fs = require('node:fs');
 const path = require('node:path');
-const dotenv = require('dotenv');
-dotenv.config();
+const logger = require('./utils/logger');
+require('dotenv').config()
 
 // instantiate client
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ 
+    intents: [
+        GatewayIntentBits.Guilds, 
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent
+    ] 
+});
 client.commands = new Collection();
 
 // access 'commands' folder and read enclosed folders
@@ -24,10 +31,11 @@ for (const dir of commandDirs) {
         if ('data' in command && 'execute' in command) {
             client.commands.set(command.data.name, command);
         } else {
-            console.log(`[WARNING] The command at ${filePath} is missing a require "data" or "execute" property.`);
+            logger.warn(`The command at ${filePath} is missing a required "data" or "execute" property.`);
         }
     }
 }
+logger.info(`Loaded ${client.commands.size} commands`);
 
 const eventsPath = path.join(__dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
@@ -41,5 +49,12 @@ for (const file of eventFiles) {
         client.on(event.name, (...args) => event.execute(...args));
     }
 }
+
+// Set up the message listener
+setupMessageListener(client);
+
+process.on('unhandledRejection', error => {
+    logger.error('Unhandled promise rejection:', error);
+});
 
 client.login(process.env.token);

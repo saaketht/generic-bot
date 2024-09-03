@@ -1,0 +1,33 @@
+{
+    "replicate": {
+      "imageModel": "black-forest-labs/flux-schnell",
+      "audioModel": "riffusion/riffusion:8cf61ea6c56afd61d8f5b9ffd14d7c216c0a93844ce2d82ac1c9ecc9c7f24e05"
+    },
+    "bot": {
+      "triggerWords": ["generbot", "ai"]
+    },
+    "perplexityAI": {
+      "apiUrl": "https://api.perplexity.ai/chat/completions",
+      "model": "llama-3.1-sonar-small-128k-online",
+      "temperature": 1,
+      "top_p": 0.9,
+      "top_k": 0,
+      "presence_penalty": 0.5,
+      "frequency_penalty": 1,
+      "max_tokens": 800
+    },
+    "commands": {
+      "imagen": {
+        "numOutputs": 1,
+        "aspectRatio": "1:1",
+        "outputFormat": "webp",
+        "outputQuality": 90
+      },
+      "audiogen": {
+        "alpha": 0.5,
+        "denoising": 0.75,
+        "seedImageId": "vibes",
+        "numInferenceSteps": 50
+      }
+    }
+  }

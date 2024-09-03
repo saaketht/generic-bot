@@ -1,19 +1,13 @@
 const { SlashCommandBuilder } = require('discord.js');
 const Replicate = require('replicate');
+const config = require('../../config');
+const logger = require('../../utils/logger');
+const { getFormattedDate } = require('../../utils/dateFormatter');
+const { rateLimiter } = require('../../utils/rateLimiter');
 
 const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN,
+    auth: process.env.REPLICATE_API_TOKEN,
 });
-
-function getFormattedDate() {
-    const now = new Date();
-    const day = String(now.getDate()).padStart(2, '0');
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const year = String(now.getFullYear()).slice(-2);
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    return `${hours}${minutes}-${day}${month}${year}`;
-}
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -30,6 +24,10 @@ module.exports = {
             option.setName('ephemeral')
                 .setDescription('Whether or not the outputs should be ephemeral')),
     async execute(interaction) {
+        if (!rateLimiter(interaction.user.id, 'audiogen', 3, 300000)) {
+            return interaction.reply({ content: 'Rate limit exceeded. Please try again later.', ephemeral: true });
+        }
+
         await interaction.deferReply({ ephemeral: interaction.options.getBoolean('ephemeral') ?? false });
 
         const prompt_a = interaction.options.getString('prompt_a');
@@ -37,18 +35,12 @@ module.exports = {
 
         try {
             const input = {
-                alpha: 0.5,
                 prompt_a: prompt_a,
                 prompt_b: prompt_b,
-                denoising: 0.75,
-                seed_image_id: "vibes",
-                num_inference_steps: 50
+                ...config.commands.audiogen
             };
 
-            const output = await replicate.run(
-                "riffusion/riffusion:8cf61ea6c56afd61d8f5b9ffd14d7c216c0a93844ce2d82ac1c9ecc9c7f24e05",
-                { input }
-            );
+            const output = await replicate.run(config.replicate.audioModel, { input });
 
             if (output && output.audio) {
                 const fileName = `output_${getFormattedDate()}.mp3`;
@@ -61,7 +53,7 @@ module.exports = {
                         }
                     ]
                 });
-                
+
                 if (output.spectrogram) {
                     await interaction.followUp({
                         content: 'spectrogram:',
@@ -74,11 +66,12 @@ module.exports = {
                         ephemeral: interaction.options.getBoolean('ephemeral') ?? false
                     });
                 }
+                logger.info(`Successfully generated ${type} for user ${interaction.user.tag}`);
             } else {
                 await interaction.editReply('Sorry, I couldn\'t generate the audio. Please try again.');
             }
         } catch (error) {
-            console.error('Error generating audio:', error);
+            logger.error('Error generating audio:', error);
             await interaction.editReply('An error occurred while generating the audio. Please try again later.');
         }
     },
