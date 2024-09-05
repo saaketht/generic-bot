@@ -1,9 +1,11 @@
 const axios = require('axios');
 const logger = require('../../utils/logger.js');
+const commandDebounce = require('../../utils/commandDebounce');
 const { safeStringify } = require('../../utils/jsonUtils');
 const { handleSSEStream } = require('../../utils/sseHandler.js');
 const config = require('../../config.json');
 
+CHATBOT_COOLDOWN_SECONDS = 1
 exports.handleChatbotMessage = async (message) => {
     if (!process.env.PERPLEXITY_API_TOKEN) {
         logger.error('Perplexity API key is not defined');

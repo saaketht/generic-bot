@@ -11,7 +11,7 @@ function commandDebounce(userId, commandName, cooldownSeconds = 3) {
     const now = Date.now();
     const lastExecution = commandCooldowns.get(key);
 
-    if (lastExecution && now - lastExecution < cooldownTime) {
+    if (lastExecution && now - lastExecution < cooldownMs) {
         logger.warn(`Command ${commandName} executed too quickly by user ${userId}`);
         return false;
     }

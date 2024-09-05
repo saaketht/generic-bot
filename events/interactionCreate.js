@@ -14,6 +14,7 @@ module.exports = {
             logger.error(`Error executing command ${interaction.commandName}: ${error.message}`);
         }
 
+        /* reintegrate when needed
         if (!commandDebounce(interaction.user.id, interaction.commandName)) {
             try {
                 await interaction.reply({ content: 'Please wait a moment before using this command again.', ephemeral: true });
@@ -22,6 +23,7 @@ module.exports = {
             }
             return;
         }
+        */
 
         try {
             await command.execute(interaction);
