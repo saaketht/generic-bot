@@ -38,7 +38,7 @@ exports.handleChatbotMessage = async (message) => {
     const requestData = {
         model: config.perplexityAI.model,
         messages: [
-            { role: 'system', content: 'respond like a gen-z person' }, // System message to guide the AI's behavior
+            { role: 'system', content: 'respond like a gen-z person and keep overall responses under 1000 tokens' }, // System message to guide the AI's behavior
             { role: 'user', content: query }                        // User's query
         ],
         // Include all configurable parameters
