@@ -1,5 +1,5 @@
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-const { setupMessageListener } = require('./events/MessageCreate/chatbotHandler');
+const { setupMessageListener } = require('./events/messageCreate/chatbotHandler');
 const fs = require('node:fs');
 const path = require('node:path');
 const logger = require('./utils/logger');
