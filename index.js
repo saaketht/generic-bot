@@ -1,8 +1,8 @@
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-const { setupMessageListener } = require('./events/messageCreate/chatbotHandler');
 const fs = require('node:fs');
 const path = require('node:path');
 const logger = require('./utils/logger');
+const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { setupMessageListener } = require('./events/messageCreate/chatbotHandler');
 require('dotenv').config()
 
 // instantiate client
@@ -10,7 +10,8 @@ const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildVoiceStates
     ] 
 });
 client.commands = new Collection();
@@ -23,7 +24,7 @@ for (const dir of commandDirs) {
     // read each command within each enclosed command folder
     const commandPath = path.join(commandsPath, dir);
     const commandFiles = fs.readdirSync(commandPath).filter(file => file.endsWith('.js'));
-
+    
     for (const file of commandFiles) {
         const filePath = path.join(commandPath, file);
         const command = require(filePath); // import each command to index.js

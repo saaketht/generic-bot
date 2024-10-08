@@ -28,6 +28,9 @@
         "denoising": 0.75,
         "seedImageId": "vibes",
         "numInferenceSteps": 50
+      },
+      "streaming": {
+        "maxDuration": 3600
       }
     }
   }

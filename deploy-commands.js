@@ -1,7 +1,9 @@
-const {REST, Routes} = require('discord.js');
-const logger = require('./utils/logger')
 const fs = require('node:fs');
 const path = require('node:path');
+const logger = require('./utils/logger')
+const {REST, Routes} = require('discord.js');
+const streamCommand = require('./commands/util/stream.js');
+require('dotenv').config()
 
 const commands = [];
 // get all command folders from commands dir
